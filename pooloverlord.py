@@ -5,6 +5,7 @@ import time
 import requests
 import logging
 from flask import Flask, request, Response, stream_with_context, jsonify
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 # =============================================================================
 # CONFIGURATION
@@ -73,6 +74,7 @@ logging.basicConfig(
 logger = logging.getLogger("PoolOverlord")
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 # Tarpit State
 unauthorized_ips = set()
