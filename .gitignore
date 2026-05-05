@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+captured_scans/
+captured_scans_v*/
+live_test_results/
+pool.log
+debug_*.py
+PoolOverlord_v*.py
+.env
+.DS_Store
