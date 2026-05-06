@@ -1,23 +1,25 @@
-# PoolOverlord
+# PoolOverlord v1.0.11
 
-**PoolOverlord** is a Python-based security proxy and "Digital Tarpit" designed to shield local LLM instances (LM Studio, Ollama) from unauthorized access and automated scanners. 
+**PoolOverlord** is a modular security proxy and "Digital Tarpit" designed to shield local LLM instances (LM Studio, Ollama) from unauthorized access, credential harvesters, and automated scanners.
 
-It provides authentication, CORS/PNA compliance for Google AI Studio, and a high-fidelity gaslighting engine to grief malicious actors searching for common vulnerabilities.
+It provides a high-fidelity gaslighting engine and "Hook & Squeeze" latency traps to waste attacker resources while maintaining a professional facade.
 
-## 🛡️ Core Features
+## 🛡️ Core Features (v1.0.11)
 
-- **Digital Gaslighting**: Unauthorized requests for file paths (e.g., `wp-config.php`, `.env`) trigger your local LLM to "hallucinate" convincing, high-entropy decoys. Scanners receive 100+ lines of enterprise-grade code that looks 100% real but is logically non-functional.
-- **Log Protection**: Intercepts scanners before they hit your backend. Your LM Studio logs only show standard API traffic, never the raw scanner noise.
-- **AI Studio Integration**: Implements Private Network Access (PNA) and CORS headers required for AI Studio to communicate with local servers over Tailscale Funnel.
-- **Metadata Masking**: Intercepts and replaces model names/fingerprints with generic identifiers (`pool-core-v1`) to hide your architecture.
-- **Bypass Safety Refusals**: Uses a "Synthetic Dataset" prompting strategy to ensure models generate realistic-looking credentials for decoys without triggering standard AI safety refusals.
+- **Digital Gaslighting (LLM-Driven)**: Unauthorized requests for common vulnerability paths (e.g., `wp-config.php`, `.env`) are routed to your local LLM. It "hallucinates" high-entropy, enterprise-grade decoys that look 100% real but are logically non-functional.
+- **Hook & Squeeze (Tarpit)**: Implements byte-level latency. Scanners receive an initial burst of data to prevent connection timeouts, followed by a character-by-character "drip" that can hold a connection open for minutes.
+- **Identity Firewall (Total Immersion)**: Automatically scrubs "AI-isms" (e.g., "As an AI language model") from decoy responses. Replaces generic placeholders with high-entropy identifiers from the **Gibberish Library**.
+- **Honey-Token Poisoning**: Injects fake AWS keys, Stripe tokens, and Database URLs into generated decoys to trigger automated alerts when used by attackers.
+- **Recursive Directory Inception**: Traps scanners in infinite "Index of /" loops with fake file listings.
+- **AI Studio Integration**: Full Private Network Access (PNA) and CORS compliance for seamless use with Google AI Studio via Tailscale Funnel.
+- **Metadata Masking**: Hides your backend architecture by spoofing `model` and `system_fingerprint` identifiers.
 
 ## 🚀 Quick Start
 
 ### 1. Prerequisites
-- **Python 3.12+**
-- **LM Studio** (running a local server on port `1234`)
-- **Tailscale Funnel** (configured to point to port `5001`)
+- **Python 3.11+**
+- **LM Studio** (server active on port `1234`)
+- **Tailscale Funnel** (routing to port `5001`)
 
 ### 2. Installation
 ```bash
@@ -27,22 +29,30 @@ pip install -r requirements.txt
 ```
 
 ### 3. Configuration
-Edit the block at the top of `pooloverlord.py`:
-- `AUTH_KEY`: Your secret API key (e.g., for `X-Eldris-Key`).
-- `LM_SERVER_URL`: Your local backend address (default: `http://127.0.0.1:1234`).
+Edit the configuration block in `PoolOverlord.py`:
+- `AUTH_KEY`: Set your master secret.
+- `SOVEREIGN_IDENTITIES`: Customize your decoy domain and email libraries.
+- `FEATURES`: Toggle modular defensive layers (Slow Drip, Gaslight, Honey Tokens).
 
 ### 4. Running
 ```bash
-python3 pooloverlord.py
+python3 PoolOverlord.py
 ```
 
-## 🧪 Testing the Tarpit
+## 🧪 Testing the Defense
 
-To see the gaslighting in action, try requesting a sensitive file through the proxy without an API key:
+### Simulate a Scanner (GET)
+To see the tarpit and gaslighting engine in action, request a sensitive file via the Tailscale Funnel without an API key:
 ```bash
-curl http://localhost:5001/.env
+curl https://your-funnel-url.ts.net/v1/.env
 ```
-The proxy will wrap the request into a "Synthetic Dataset" prompt, causing your LLM to generate a realistic-looking (but fake) `.env` file, wasting the requester's time and compute.
+*Result: An 18-second connection hang followed by a poisoned, realistic decoy.*
+
+### Unauthorized API Access (POST)
+Test the randomized API rejection delay (10-30s) by hitting the chat endpoint with no auth:
+```bash
+curl -X POST https://your-funnel-url.ts.net/v1/chat/completions -d '{"messages": [{"role": "user", "content": "hello"}]}'
+```
 
 ## 📜 License
 MIT

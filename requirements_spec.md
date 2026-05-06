@@ -13,12 +13,16 @@ PoolOverlord is a Python-based security proxy and "tarpit" designed to sit betwe
 
 ### 2.2 The Tarpit (Unauthorized Traffic)
 - **Branching Logic**:
-    - **API Rejection**: Unauthorized requests to `/v1/` paths must return a **static 401 JSON** immediately (`{"error": "Pool's Closed. Unauthorized."}`). No LLM compute should be used.
+    - **Hook & Squeeze Delay**: Unauthorized API requests to `/v1/` paths must be intentionally stalled for 10-30 seconds (randomized) before delivering a 401 JSON rejection. This prevents rapid-fire scanning of the auth key.
     - **File Gaslighting**: Unauthorized requests to non-API paths (e.g., `/.env`, `/wp-login.php`) invoke the local LLM to generate a realistic but hallucinated "file" to waste the attacker's time.
+- **Drip Latency (The Squeeze)**: Responses to unauthorized requests must be served character-by-character with randomized delays (0.05s-0.2s) to maximize connection hold-time.
+- **Identity Firewall**: All gaslighted content must be scrubbed of "AI-isms" (disclaimers, "As an AI model") and generic placeholders using the **Gibberish Library** (e.g., `vorphyx-core.net`).
+- **Honey-Token Poisoning**: Inject fake, high-entropy credentials (AWS Keys, Stripe Tokens, Database URLs) into decoy responses to poison attacker databases.
+- **Binary Junk/Inception**: Serve infinite recursive directory listings and 0.1KB/s junk binary streams for archive extensions (`.zip`, `.gz`).
 - **State Tracking**: Maintain an in-memory set of unauthorized IPs to track "participants" in the tarpit.
 
 ### 2.3 Authentication & Access Control
-- **Multi-Header Support**: Authenticate via `X-Lulz-Key`, `Authorization: Bearer <key>`, or `X-API-Key`.
+- **Multi-Header Support**: Authenticate via `X-Eldris-Key`, `X-Lulz-Key`, `Authorization: Bearer *** or `X-API-Key`.
 - **IP Whitelisting**: Allow defined IPs (e.g., `127.0.0.1`) to bypass authentication checks for local debugging.
 - **CORS & Private Network Access**: Implement full CORS headers and `Access-Control-Allow-Private-Network: true` to satisfy browser security requirements when calling from a public domain (AI Studio).
 
